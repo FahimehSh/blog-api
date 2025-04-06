@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\PostRepository;
+use App\Models\Repositories\PostRepository;
 use Illuminate\Support\Facades\Auth;
 
 class PostService
@@ -24,20 +24,40 @@ class PostService
         return $this->postRepository->getById($id);
     }
 
-    public function store(array $postData)
+    public function store($categoryId, array $postData)
     {
         $postData['author_id'] = Auth::id();
-        return $this->postRepository->create($postData);
+        return $this->postRepository->create($categoryId, $postData);
     }
 
-    public function update($post, array $postData)
+    public function update($post, $categoryId, array $postData)
     {
-        return $this->postRepository->update($post, $postData);
+        return $this->postRepository->update($post, $categoryId, $postData);
     }
 
-    public function destroy($id)
+    public function destroy($post)
     {
-        $this->postRepository->delete($id);
+        $this->postRepository->delete($post);
+    }
+
+    public function like($post)
+    {
+        $this->postRepository->like($post);
+    }
+
+    public function unlike($post)
+    {
+        $this->postRepository->unlike($post);
+    }
+
+    public function bookmark($post)
+    {
+        $this->postRepository->bookmark($post);
+    }
+
+    public function unbookmark($post)
+    {
+        $this->postRepository->unbookmark($post);
     }
 }
 

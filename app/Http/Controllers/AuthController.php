@@ -59,26 +59,5 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'mobile' => 'required|string|max:255',
-            'password' => 'required|string|min:8', // حداقل 8 کاراکتر برای رمز عبور
-        ]);
-
-        // تلاش برای احراز هویت کاربر
-        if (Auth::attempt(['mobile' => $request->mobile, 'password' => $request->password])) {
-            $user = Auth::user();
-            $token = $user->createToken('user-login')->plainTextToken;
-
-            // بازگشت توکن و پیام موفقیت
-            return response()->json([
-                'token' => $token,
-                'message' => 'ورود با موفقیت انجام شد!',
-            ], 200);
-        }
-
-        // اگر احراز هویت ناموفق بود
-        return response()->json([
-            'message' => 'نام کاربری یا رمز عبور اشتباه است!',
-        ], 401); // کد خطای 401 برای "Unauthorized"
     }
 }

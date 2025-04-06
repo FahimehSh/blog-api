@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Support\Facades\Auth;
 
@@ -30,16 +30,28 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request)
     {
-        $postData = $request->all();
-        $post = $this->postService->store($postData);
-        return response()->json($post, 200);
+        Auth::loginUsingId(1);
+
+        $postData = $request->except('category_id');
+        $this->postService->store($request->category_id, $postData);
+
+        $data = [
+            'message' => 'پست با موفقیت افزوده شد.',
+        ];
+        return response()->json($data, 200);
     }
 
-    public function update($id, Request $request)
+    public function update($id, UpdatePostRequest $request)
     {
-        $postData = $request->all();
+        Auth::loginUsingId(1);
+
+        $postData = $request->except('category_id');
 
         $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
         if (Auth::id() !== $post->author_id && !Auth::user()->is_admin) {
             return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
         }
@@ -53,18 +65,85 @@ class PostController extends Controller
             }
         }
 
-        $post = $this->postService->update($post, $postData);
-        return response()->json($post, 200);
+        $this->postService->update($post, $request->category_id, $postData);
+
+        $data = [
+            'message' => 'پست با موفقیت به روز رسانی شد.',
+        ];
+        return response()->json($data, 200);
     }
 
     public function destroy($id)
     {
-        if (Auth::user()->is_admin == false) {
+        Auth::loginUsingId(1);
+
+        if (!Auth::user()->is_admin) {
             return response()->json(['message' => 'شما دسترسی ندارید!'], 403);
         }
 
-        $this->postService->destroy($id);
+        $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
+        $this->postService->destroy($post);
         return response()->json(['message' => 'پست مورد نظر حذف شد!'], 200);
+    }
+
+    public function like($id)
+    {
+        Auth::loginUsingId(1);
+
+        $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
+        $this->postService->like($post);
+
+        return response()->json([], 200);
+    }
+
+    public function unlike($id)
+    {
+        Auth::loginUsingId(1);
+
+        $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
+        $this->postService->unlike($post);
+
+        return response()->json([], 200);
+    }
+
+    public function bookmark($id)
+    {
+        Auth::loginUsingId(1);
+
+        $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
+        $this->postService->bookmark($post);
+
+        return response()->json([], 200);
+    }
+
+    public function unbookmark($id)
+    {
+        Auth::loginUsingId(1);
+
+        $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
+        $this->postService->unbookmark($post);
+
+        return response()->json([], 200);
     }
 }
 

@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->enum('status', ['draft', 'published'])->default('draft');
             $table->boolean('is_published')->default(false);
             $table->timestamp('published_at')->nullable();
+            $table->unsignedInteger('likes_count')->default(0);
             $table->timestamps();
             $table->softDeletes();
 

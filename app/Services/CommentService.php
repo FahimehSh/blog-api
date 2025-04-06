@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\CommentRepository;
+use App\Models\Repositories\CommentRepository;
 use Illuminate\Support\Facades\Auth;
 
 class CommentService
@@ -32,7 +32,7 @@ class CommentService
 
     public function update($comment, array $commentData)
     {
-        if ($commentData['status'] == 'published') {
+        if (isset($commentData['is_published']) && $commentData['is_published']) {
             $commentData['published_at'] = now();
         } else {
             $commentData['published_at'] = null;
@@ -40,8 +40,18 @@ class CommentService
         return $this->commentRepository->update($comment, $commentData);
     }
 
-    public function destroy($id)
+    public function destroy($comment)
     {
-        $this->commentRepository->delete($id);
+        $this->commentRepository->delete($comment);
+    }
+
+    public function like($comment)
+    {
+        $this->commentRepository->like($comment);
+    }
+
+    public function unlike($comment)
+    {
+        $this->commentRepository->unlike($comment);
     }
 }
