@@ -14,15 +14,17 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->text('content');
-            $table->foreignId('author_id');
-            $table->enum('status', ['draft', 'published'])->default('draft');
-            $table->boolean('is_published')->default(false);
-            $table->timestamp('published_at')->nullable();
+            $table->unsignedBigInteger('author_id');
+            $table->unsignedBigInteger('publisher_id');
+            $table->enum('status', ['draft', 'pending', 'published', 'rejected'])->default('draft');
             $table->unsignedInteger('likes_count')->default(0);
+            $table->unsignedInteger('views_count')->default(0);
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('author_id')->references('id')->on('users');
+            $table->foreign('publisher_id')->references('id')->on('users');
         });
     }
 

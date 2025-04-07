@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\storeCategoryRequest;
 use App\Http\Requests\updateCategoryRequest;
 use App\Services\CategoryService;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\JsonResponse;
 
 class CategoryController extends Controller
 {
@@ -17,48 +16,28 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
-        $categories = Cache::remember('categories.index', now()->addHour(), function () {
-            return $this->categoryService->getAll();
-        });
+        $categories = $this->categoryService->getAll();
 
         return response()->json($categories);
     }
 
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $category = $this->categoryService->getById($id);
         return response()->json($category);
     }
 
-    public function store(storeCategoryRequest $request)
+    public function store(storeCategoryRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
+        $this->categoryService->store($request->createCategoryDTO->toArray());
 
-        if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما مجوز لازم را ندارید.'], 403);
-        }
-
-        $categoryData = $request->all();
-        $this->categoryService->store($categoryData);
-        Cache::forget('categories.index');
-
-        $data = [
-            'message' => 'دسته بندی جدید اضافه شد.',
-        ];
-
-        return response()->json($data, 200);
+        return response()->json(['message' => 'دسته بندی جدید اضافه شد.']);
     }
 
-    public function update($id, updateCategoryRequest $request)
+    public function update(int $id, updateCategoryRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
-
-        if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما مجوز لازم را ندارید.'], 403);
-        }
-
         $category = $this->categoryService->getById($id);
         if (!$category) {
             return response()->json(['message' => 'دسته بندی مورد نظر وجود ندارد.'], 404);
@@ -66,19 +45,12 @@ class CategoryController extends Controller
 
         $categoryData = $request->all();
         $this->categoryService->update($category, $categoryData);
-        Cache::forget('categories.index');
 
-        return response()->json(['message' => 'دسته بندی مورد نظر به روزرسانی شد.'], 200);
+        return response()->json(['message' => 'دسته بندی مورد نظر به روزرسانی شد.']);
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
-        if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما مجوز لازم را ندارید.'], 403);
-        }
-
         $category = $this->categoryService->getById($id);
         if (!$category) {
             return response()->json(['message' => 'دسته بندی مورد نظر وجود ندارد.'], 404);
@@ -87,6 +59,6 @@ class CategoryController extends Controller
         $category = $this->categoryService->getById($id);
         $this->categoryService->destroy($category);
 
-        return response()->json(['message' => 'دسته بندی مورد نظر حذف شد!'], 200);
+        return response()->json(['message' => 'دسته بندی مورد نظر حذف شد!']);
     }
 }

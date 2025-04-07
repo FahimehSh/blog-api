@@ -30,6 +30,6 @@ class Comment extends Model
 
     public function likes()
     {
-        return $this->morphMany(Action::class, 'actionable')->where('action_type', 'like');
+        return $this->morphMany(Like::class, 'likeable');
     }
 }

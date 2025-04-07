@@ -1,25 +1,32 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models\Repositories;
 
 use App\Enums\ActionType;
 use App\Models\Comment;
+use Illuminate\Database\Eloquent\Collection;
 
 class CommentRepository
 {
-    public function getAll()
+    public function getAll(): Collection
     {
         return Comment::all();
     }
 
+    public function getPublishedComments(): array
+    {
+        return Comment::query()->where('is_published', true)->get()->toArray();
+    }
+
     public function getById($id)
     {
-        return Comment::find($id);
+        return Comment::query()->find($id);
     }
 
     public function create(array $commentData)
     {
-        return Comment::create($commentData);
+        return Comment::query()->create($commentData);
     }
 
     public function update($comment, array $commentData)
@@ -28,12 +35,12 @@ class CommentRepository
         return $comment;
     }
 
-    public function delete($comment)
+    public function delete($comment): void
     {
         $comment->delete();
     }
 
-    public function like($comment)
+    public function like($comment): void
     {
         $comment->likes()->create([
             'user_id' => auth()->id(),
@@ -43,7 +50,7 @@ class CommentRepository
         $comment->update(['likes_count' => $comment->likes_count + 1]);
     }
 
-    public function unlike($comment)
+    public function unlike($comment): void
     {
         $comment->likes()
             ->where('user_id', auth()->id())

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedInteger('verification_code');
             $table->timestamp('mobile_verified_at')->nullable();
             $table->boolean('is_admin')->default(false);
+            $table->json('chat_ids')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

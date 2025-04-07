@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\storeCommentRequest;
 use App\Http\Requests\updateCommentRequest;
 use App\Services\CommentService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
@@ -16,35 +17,28 @@ class CommentController extends Controller
         $this->commentService = $commentService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $comments = $this->commentService->getAll();
         return response()->json($comments);
     }
 
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $comment = $this->commentService->getById($id);
         return response()->json($comment);
     }
 
-    public function store(storeCommentRequest $request)
+    public function store(storeCommentRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $commentData = $request->all();
         $this->commentService->store($commentData);
 
-        $data = [
-            'message' => 'کامنت شما با موفقیت ذخیره شد.',
-        ];
-        return response()->json($data, 200);
+        return response()->json(['message' => 'کامنت شما با موفقیت ذخیره شد.']);
     }
 
-    public function update($id, updateCommentRequest $request)
+    public function update(int $id, updateCommentRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $commentData = $request->all();
 
         $comment = $this->commentService->getById($id);
@@ -52,35 +46,31 @@ class CommentController extends Controller
             return response()->json(['message' => 'کامنت مورد نظر وجود ندارد.'], 404);
         }
 
-        if (Auth::id() !== $comment->author_id && !Auth::user()->is_admin) {
+        if (Auth::id() !== $comment->author_id && Auth::user()->is_admin === false) {
             return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این کامنت را ندارید.'], 403);
         }
 
-        if (Auth::id() == $comment->author_id && $comment->is_published) {
+        if (Auth::id() === $comment->author_id && $comment->is_published) {
             return response()->json(['message' => 'امکان به روزرسانی این کامنت وجود ندارد.'], 403);
         }
 
         if (isset($commentData['is_published'])) {
             if (!Auth::user()->is_admin) {
                 return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
-            } else {
-                $commentData['is_published'] = $commentData['is_published'] ? true : false;
-                $commentData['published_at'] = $commentData['is_published'] ? now() : null;
             }
+
+            $commentData['is_published'] = (bool)$commentData['is_published'];
+            $commentData['published_at'] = $commentData['is_published'] ? now() : null;
+
         }
 
         $this->commentService->update($comment, $commentData);
 
-        $data = [
-            'message' => 'کامنت شما با موفقیت به روز رسانی شد.',
-        ];
-        return response()->json($data, 200);
+        return response()->json(['message' => 'کامنت شما با موفقیت به روز رسانی شد.']);
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $comment = $this->commentService->getById($id);
         if (!$comment) {
             return response()->json(['message' => 'کامنت مورد نظر وجود ندارد.'], 404);
@@ -91,13 +81,12 @@ class CommentController extends Controller
         }
 
         $this->commentService->destroy($comment);
-        return response()->json(['message' => 'کامنت مورد نظر حذف شد!'], 200);
+
+        return response()->json(['message' => 'کامنت مورد نظر حذف شد!']);
     }
 
-    public function like($id)
+    public function like(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $comment = $this->commentService->getById($id);
         if (!$comment) {
             return response()->json(['message' => 'کامنت مورد نظر وجود ندارد.'], 404);
@@ -105,13 +94,11 @@ class CommentController extends Controller
 
         $this->commentService->like($comment);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 
-    public function unlike($id)
+    public function unlike(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $comment = $this->commentService->getById($id);
         if (!$comment) {
             return response()->json(['message' => 'کامنت مورد نظر وجود ندارد.'], 404);
@@ -119,7 +106,7 @@ class CommentController extends Controller
 
         $this->commentService->unlike($comment);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 }
 

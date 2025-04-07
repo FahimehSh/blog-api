@@ -1,41 +1,48 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models\Repositories;
 
 use App\Enums\ActionType;
 use App\Models\Post;
+use Illuminate\Database\Eloquent\Collection;
 
 class PostRepository
 {
-    public function getAll()
+    public function getAll(): Collection
     {
         return Post::all();
     }
 
-    public function getById($id)
+    public function getPublishedPosts(): array
     {
-        return Post::find($id);
+        return Post::query()->where('status', 'published')->get()->toArray();
     }
 
-    public function create($categoryId, array $postData)
+    public function getById($id)
+    {
+        return Post::query()->find($id);
+    }
+
+    public function create($categoryId, array $postData): void
     {
         $post = Post::query()->create($postData);
         $post->categories()->attach($categoryId);
     }
 
-    public function update($post, $categoryId, array $postData)
+    public function update($post, $categoryId, array $postData): void
     {
         $post->update($postData);
         $post->categories()->sync([$categoryId]);
     }
 
-    public function delete($post)
+    public function delete($post): void
     {
         $post->comments()->delete();
         $post->delete();
     }
 
-    public function like($post)
+    public function like($post): void
     {
         $post->likes()->create([
             'user_id' => auth()->id(),
@@ -45,7 +52,7 @@ class PostRepository
         $post->update(['likes_count' => $post->likes_count + 1]);
     }
 
-    public function unlike($post)
+    public function unlike($post): void
     {
         $post->likes()
             ->where('user_id', auth()->id())
@@ -54,7 +61,7 @@ class PostRepository
         $post->update(['likes_count' => $post->likes_count - 1]);
     }
 
-    public function bookmark($post)
+    public function bookmark($post): void
     {
         $post->bookmarks()->create([
             'user_id' => auth()->id(),
@@ -62,7 +69,7 @@ class PostRepository
         ]);
     }
 
-    public function unbookmark($post)
+    public function unbookmark($post): void
     {
         $post->bookmarks()
             ->where('user_id', auth()->id())

@@ -40,17 +40,17 @@ class CommentService
         return $this->commentRepository->update($comment, $commentData);
     }
 
-    public function destroy($comment)
+    public function destroy($comment): void
     {
         $this->commentRepository->delete($comment);
     }
 
-    public function like($comment)
+    public function like($comment): void
     {
         $this->commentRepository->like($comment);
     }
 
-    public function unlike($comment)
+    public function unlike($comment): void
     {
         $this->commentRepository->unlike($comment);
     }

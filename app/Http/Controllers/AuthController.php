@@ -41,7 +41,7 @@ class AuthController extends Controller
 
         $user = User::query()->where('mobile', $mobile)->first();
 
-        if ($verificationCode == $user->verification_code) {
+        if ($verificationCode === $user->verification_code) {
             $user->mobile_verified_at = now();
             $user->save();
             $data = [

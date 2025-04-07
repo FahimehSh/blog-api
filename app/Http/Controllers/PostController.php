@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -17,7 +18,7 @@ class PostController extends Controller
         $this->postService = $postService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $posts = Cache::remember('posts.index', now()->addHour(), function () {
             return $this->postService->getAll();
@@ -26,30 +27,23 @@ class PostController extends Controller
         return response()->json($posts);
     }
 
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
         $post = $this->postService->getById($id);
         return response()->json($post);
     }
 
-    public function store(StorePostRequest $request)
+    public function store(StorePostRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $postData = $request->except('category_id');
         $this->postService->store($request->category_id, $postData);
         Cache::forget('posts.index');
 
-        $data = [
-            'message' => 'پست با موفقیت افزوده شد.',
-        ];
-        return response()->json($data, 200);
+        return response()->json(['message' => 'پست با موفقیت افزوده شد.']);
     }
 
-    public function update($id, UpdatePostRequest $request)
+    public function update(int $id, UpdatePostRequest $request): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $postData = $request->except('category_id');
 
         $post = $this->postService->getById($id);
@@ -65,7 +59,7 @@ class PostController extends Controller
             if (!Auth::user()->is_admin) {
                 return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
             } else {
-                $postData['is_published'] = $postData['is_published'] ? true : false;
+                $postData['is_published'] = (bool)$postData['is_published'];
                 $postData['published_at'] = $postData['is_published'] ? now() : null;
             }
         }
@@ -73,16 +67,11 @@ class PostController extends Controller
         $this->postService->update($post, $request->category_id, $postData);
         Cache::forget('posts.index');
 
-        $data = [
-            'message' => 'پست با موفقیت به روز رسانی شد.',
-        ];
-        return response()->json($data, 200);
+        return response()->json(['message' => 'پست با موفقیت به روز رسانی شد.']);
     }
 
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         if (!Auth::user()->is_admin) {
             return response()->json(['message' => 'شما دسترسی ندارید!'], 403);
         }
@@ -93,13 +82,11 @@ class PostController extends Controller
         }
 
         $this->postService->destroy($post);
-        return response()->json(['message' => 'پست مورد نظر حذف شد!'], 200);
+        return response()->json(['message' => 'پست مورد نظر حذف شد!']);
     }
 
-    public function like($id)
+    public function like(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $post = $this->postService->getById($id);
         if (!$post) {
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
@@ -107,13 +94,11 @@ class PostController extends Controller
 
         $this->postService->like($post);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 
-    public function unlike($id)
+    public function unlike(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $post = $this->postService->getById($id);
         if (!$post) {
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
@@ -121,13 +106,11 @@ class PostController extends Controller
 
         $this->postService->unlike($post);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 
-    public function bookmark($id)
+    public function bookmark(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $post = $this->postService->getById($id);
         if (!$post) {
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
@@ -135,13 +118,11 @@ class PostController extends Controller
 
         $this->postService->bookmark($post);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 
-    public function unbookmark($id)
+    public function unbookmark(int $id): JsonResponse
     {
-        Auth::loginUsingId(1);
-
         $post = $this->postService->getById($id);
         if (!$post) {
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
@@ -149,7 +130,7 @@ class PostController extends Controller
 
         $this->postService->unbookmark($post);
 
-        return response()->json([], 200);
+        return response()->json();
     }
 }
 

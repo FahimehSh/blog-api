@@ -1,21 +1,22 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Services;
 
 use App\Enums\CategoryStatus;
 use App\Models\Repositories\CategoryRepository;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService
 {
-    protected $categoryRepository;
+    protected CategoryRepository $categoryRepository;
 
     public function __construct(CategoryRepository $categoryRepository)
     {
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function getAll()
+    public function getAll(): Collection
     {
         return $this->categoryRepository->getAll();
     }
@@ -35,7 +36,7 @@ class CategoryService
         return $this->categoryRepository->update($category, $categoryData);
     }
 
-    public function destroy($category)
+    public function destroy($category): void
     {
         $this->categoryRepository->delete($category);
     }

@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->string('path');
             $table->string('url')->nullable();
             $table->string('size');
+            $table->string('md5_content')->nullable();
+            $table->enum('disk', ['storage', 's3', 'ftp'])->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

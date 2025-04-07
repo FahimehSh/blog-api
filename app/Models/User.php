@@ -58,19 +58,14 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
-    public function actions()
-    {
-        return $this->hasMany(Action::class);
-    }
-
     public function likes()
     {
-        return $this->hasMany(Action::class)->where('action_type', ActionType::LIKE);
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function bookmarks()
     {
-        return $this->hasMany(Action::class)->where('action_type', ActionType::BOOKMARK);
+        return $this->hasMany(Bookmark::class);
     }
 
     public function avatar()

@@ -35,12 +35,12 @@ class Post extends Model
 
     public function likes()
     {
-        return $this->morphMany(Action::class, 'actionable')->where('action_type', ActionType::LIKE);
+        return $this->morphMany(Like::class, 'likeable');
     }
 
     public function bookmarks()
     {
-        return $this->morphMany(Action::class, 'actionable')->where('action_type', ActionType::BOOKMARK);
+        return $this->morphMany(Bookmark::class, 'bookmarkable');
     }
 
     public function files()
