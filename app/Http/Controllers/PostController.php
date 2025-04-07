@@ -6,6 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -18,7 +19,10 @@ class PostController extends Controller
 
     public function index()
     {
-        $posts = $this->postService->getAll();
+        $posts = Cache::remember('posts.index', now()->addHour(), function () {
+            return $this->postService->getAll();
+        });
+
         return response()->json($posts);
     }
 
@@ -34,6 +38,7 @@ class PostController extends Controller
 
         $postData = $request->except('category_id');
         $this->postService->store($request->category_id, $postData);
+        Cache::forget('posts.index');
 
         $data = [
             'message' => 'پست با موفقیت افزوده شد.',
@@ -66,6 +71,7 @@ class PostController extends Controller
         }
 
         $this->postService->update($post, $request->category_id, $postData);
+        Cache::forget('posts.index');
 
         $data = [
             'message' => 'پست با موفقیت به روز رسانی شد.',

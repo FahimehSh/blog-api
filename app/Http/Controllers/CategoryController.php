@@ -6,6 +6,7 @@ use App\Http\Requests\storeCategoryRequest;
 use App\Http\Requests\updateCategoryRequest;
 use App\Services\CategoryService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class CategoryController extends Controller
 {
@@ -18,7 +19,10 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = $this->categoryService->getAll();
+        $categories = Cache::remember('categories.index', now()->addHour(), function () {
+            return $this->categoryService->getAll();
+        });
+
         return response()->json($categories);
     }
 
@@ -38,6 +42,7 @@ class CategoryController extends Controller
 
         $categoryData = $request->all();
         $this->categoryService->store($categoryData);
+        Cache::forget('categories.index');
 
         $data = [
             'message' => 'دسته بندی جدید اضافه شد.',
@@ -61,6 +66,7 @@ class CategoryController extends Controller
 
         $categoryData = $request->all();
         $this->categoryService->update($category, $categoryData);
+        Cache::forget('categories.index');
 
         return response()->json(['message' => 'دسته بندی مورد نظر به روزرسانی شد.'], 200);
     }
