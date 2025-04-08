@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\ActionType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,9 +15,11 @@ class Post extends Model
         'author_id',
         'category_id',
         'likes_count',
+        'status',
+        'published_at',
     ];
 
-    public function user()
+    public function author()
     {
         return $this->belongsTo(User::class);
     }

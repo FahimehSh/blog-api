@@ -15,12 +15,12 @@ class storeCategoryRequest extends FormRequest
         return true;
     }
 
-    public function prepareForValidation(): void
-    {
-        $this->merge([
-            'name' => 'ahmad'
-        ]);
-    }
+//    public function prepareForValidation(): void
+//    {
+//        $this->merge([
+//            'name' => 'ahmad'
+//        ]);
+//    }
 
 
     public function rules(): array

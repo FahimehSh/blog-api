@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\CheckAdmin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -16,11 +17,11 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::prefix('categories')->name('categories.')->group(function () {
     Route::get('/', [CategoryController::class, 'index'])->name('index');
+    Route::post('/create', [CategoryController::class, 'store'])->middleware(CheckAdmin::class)->name('store');
 
     Route::prefix('{category}')->group(function () {
         Route::get('/show', [CategoryController::class, 'show'])->name('show');
         Route::middleware(CheckAdmin::class)->group(function () {
-            Route::post('/create', [CategoryController::class, 'store'])->name('categories.store');
             Route::put('/update', [CategoryController::class, 'update'])->name('update');
             Route::delete('/delete', [CategoryController::class, 'destroy'])->name('destroy');
         });
@@ -29,24 +30,33 @@ Route::prefix('categories')->name('categories.')->group(function () {
     Route::post('/', [CategoryController::class, 'store'])->name('store');
 });
 
-Route::prefix('posts')->group(function () {
-    Route::get('/', [PostController::class, 'index'])->name('posts.index');
-    Route::get('/{post}', [PostController::class, 'show'])->name('posts.show');
-    Route::post('/', [PostController::class, 'store'])->name('posts.store');
-    Route::put('/{post}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
-    Route::post('/{post}/like', [PostController::class, 'like'])->name('posts.like');
-    Route::delete('/{post}/like', [PostController::class, 'unlike'])->name('posts.unlike');
-    Route::post('/{post}/bookmark', [PostController::class, 'bookmark'])->name('posts.bookmark');
-    Route::delete('/{post}/bookmark', [PostController::class, 'unbookmark'])->name('posts.unbookmark');
+Route::prefix('posts')->name('posts.')->group(function () {
+    Route::get('/', [PostController::class, 'index'])->name('index');
+    Route::post('/create', [PostController::class, 'store'])->name('store');
+
+    Route::prefix('{post}')->group(function () {
+        Route::get('/show', [PostController::class, 'show'])->name('show');
+        Route::put('/update', [PostController::class, 'update'])->name('update');
+        Route::delete('/delete', [PostController::class, 'destroy'])->name('destroy');
+        Route::post('/like', [PostController::class, 'like'])->name('like');
+        Route::delete('/unlike', [PostController::class, 'unlike'])->name('unlike');
+        Route::post('/bookmark', [PostController::class, 'bookmark'])->name('bookmark');
+        Route::delete('/unbookmark', [PostController::class, 'unbookmark'])->name('unbookmark');
+    });
 });
 
-Route::prefix('comments')->group(function () {
-    Route::get('/', [CommentController::class, 'index'])->name('comments.index');
-    Route::get('/{comment}', [CommentController::class, 'show'])->name('comments.show');
-    Route::post('/', [CommentController::class, 'store'])->name('comments.store');
-    Route::put('/{comment}', [CommentController::class, 'update'])->name('comments.update');
-    Route::delete('/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
-    Route::post('/{comment}/like', [CommentController::class, 'like'])->name('comments.like');
-    Route::delete('/{comment}/like', [CommentController::class, 'unlike'])->name('comments.unlike');
+Route::prefix('comments')->name('comments.')->group(function () {
+    Route::get('/', [CommentController::class, 'index'])->name('index');
+    Route::post('/create', [CommentController::class, 'store'])->name('store');
+
+    Route::prefix('{comment}')->group(function () {
+        Route::get('/show', [CommentController::class, 'show'])->name('show');
+        Route::put('/update', [CommentController::class, 'update'])->name('update');
+        Route::delete('/delete', [CommentController::class, 'destroy'])->name('destroy');
+        Route::post('/like', [CommentController::class, 'like'])->name('like');
+        Route::delete('/unlike', [CommentController::class, 'unlike'])->name('unlike');
+    });
 });
+
+Route::get('/telegram-chat-id', [UserController::class, 'getTelegramChatId'])->name('users.getTelegramChatId');
+

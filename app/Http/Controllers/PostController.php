@@ -7,7 +7,6 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class PostController extends Controller
 {
@@ -20,9 +19,7 @@ class PostController extends Controller
 
     public function index(): JsonResponse
     {
-        $posts = Cache::remember('posts.index', now()->addHour(), function () {
-            return $this->postService->getAll();
-        });
+        $posts = $this->postService->getAll();
 
         return response()->json($posts);
     }
@@ -30,6 +27,10 @@ class PostController extends Controller
     public function show(int $id): JsonResponse
     {
         $post = $this->postService->getById($id);
+        if (!$post) {
+            return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
+        }
+
         return response()->json($post);
     }
 
@@ -37,15 +38,12 @@ class PostController extends Controller
     {
         $postData = $request->except('category_id');
         $this->postService->store($request->category_id, $postData);
-        Cache::forget('posts.index');
 
         return response()->json(['message' => 'پست با موفقیت افزوده شد.']);
     }
 
     public function update(int $id, UpdatePostRequest $request): JsonResponse
     {
-        $postData = $request->except('category_id');
-
         $post = $this->postService->getById($id);
         if (!$post) {
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
@@ -55,17 +53,17 @@ class PostController extends Controller
             return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
         }
 
-        if (isset($postData['is_published'])) {
+        $postData = $request->except('category_id');
+
+        if (isset($postData['status']) && ($postData['status'] === 'published' || $postData['status'] === 'rejected')) {
             if (!Auth::user()->is_admin) {
                 return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
-            } else {
-                $postData['is_published'] = (bool)$postData['is_published'];
-                $postData['published_at'] = $postData['is_published'] ? now() : null;
             }
+
+            $postData['published_at'] = $postData['status'] === 'published' ? now() : null;
         }
 
         $this->postService->update($post, $request->category_id, $postData);
-        Cache::forget('posts.index');
 
         return response()->json(['message' => 'پست با موفقیت به روز رسانی شد.']);
     }
@@ -82,6 +80,7 @@ class PostController extends Controller
         }
 
         $this->postService->destroy($post);
+
         return response()->json(['message' => 'پست مورد نظر حذف شد!']);
     }
 

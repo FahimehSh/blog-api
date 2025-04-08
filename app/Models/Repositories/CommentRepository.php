@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace App\Models\Repositories;
 
-use App\Enums\ActionType;
 use App\Models\Comment;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -44,7 +43,6 @@ class CommentRepository
     {
         $comment->likes()->create([
             'user_id' => auth()->id(),
-            'action_type' => ActionType::LIKE,
         ]);
 
         $comment->update(['likes_count' => $comment->likes_count + 1]);

@@ -20,12 +20,17 @@ class CommentController extends Controller
     public function index(): JsonResponse
     {
         $comments = $this->commentService->getAll();
+
         return response()->json($comments);
     }
 
     public function show(int $id): JsonResponse
     {
         $comment = $this->commentService->getById($id);
+        if (!$comment) {
+            return response()->json(['message' => 'کامنت مورد نظر وجود ندارد.'], 404);
+        }
+
         return response()->json($comment);
     }
 

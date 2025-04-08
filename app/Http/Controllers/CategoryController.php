@@ -26,6 +26,10 @@ class CategoryController extends Controller
     public function show(int $id): JsonResponse
     {
         $category = $this->categoryService->getById($id);
+        if (!$category) {
+            return response()->json(['message' => 'دسته بندی مورد نظر وجود ندارد.'], 404);
+        }
+
         return response()->json($category);
     }
 

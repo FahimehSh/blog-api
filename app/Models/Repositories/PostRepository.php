@@ -3,15 +3,18 @@ declare(strict_types=1);
 
 namespace App\Models\Repositories;
 
-use App\Enums\ActionType;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class PostRepository
 {
     public function getAll(): Collection
     {
-        return Post::all();
+        return Cache::remember('posts.index', now()->addHour(), function () {
+            return Post::all();
+        });
     }
 
     public function getPublishedPosts(): array
@@ -27,13 +30,19 @@ class PostRepository
     public function create($categoryId, array $postData): void
     {
         $post = Post::query()->create($postData);
+        Cache::forget('posts.index');
         $post->categories()->attach($categoryId);
+        $category = Category::query()->find($categoryId);
+        $category->update(['posts_count' => $category->posts_count + 1]);
     }
 
     public function update($post, $categoryId, array $postData): void
     {
         $post->update($postData);
+        Cache::forget('posts.index');
         $post->categories()->sync([$categoryId]);
+//        $category = Category::query()->find($categoryId);
+//        $category->update(['posts_count' => $category->posts_count + 1]);
     }
 
     public function delete($post): void
@@ -46,7 +55,6 @@ class PostRepository
     {
         $post->likes()->create([
             'user_id' => auth()->id(),
-            'action_type' => ActionType::LIKE,
         ]);
 
         $post->update(['likes_count' => $post->likes_count + 1]);
@@ -65,7 +73,6 @@ class PostRepository
     {
         $post->bookmarks()->create([
             'user_id' => auth()->id(),
-            'action_type' => ActionType::BOOKMARK,
         ]);
     }
 
