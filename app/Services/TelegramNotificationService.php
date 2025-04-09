@@ -11,7 +11,7 @@ class TelegramNotificationService implements NotificationBotInterface
     {
         $telegram_bot_token = config('services.telegram-bot-api.token');
         $client = new Client();
-        $res = $client->post("https://api.telegram.org/bot{$telegram_bot_token}/getUpdates", []);
+        $res = $client->post("https://api.telegram.org/bot{$telegram_bot_token}/getUpdates");
 
         $response = json_decode($res->getBody()->getContents(), true);
 
