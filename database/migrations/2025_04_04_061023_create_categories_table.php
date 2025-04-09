@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name', 60);
             $table->string('posts_count')->default(0);
             $table->timestamps();
             $table->softDeletes();

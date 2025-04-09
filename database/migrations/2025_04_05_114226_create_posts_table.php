@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->text('content');
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('publisher_id')->nullable();
-            $table->enum('status', ['draft', 'pending', 'published', 'rejected'])->default('draft');
+            $table->enum('status', ['draft', 'pending', 'published', 'rejected'])->default('draft')->index();
             $table->unsignedInteger('likes_count')->default(0);
             $table->unsignedInteger('views_count')->default(0);
             $table->timestamp('published_at')->nullable();

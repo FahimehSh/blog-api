@@ -15,9 +15,9 @@ return new class extends Migration {
             $table->text('content');
             $table->unsignedBigInteger('author_id');
             $table->unsignedBigInteger('post_id');
-            $table->unsignedBigInteger('parent_id');
-            $table->unsignedBigInteger('publisher_id');
-            $table->boolean('is_published')->default(false);
+            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->unsignedBigInteger('publisher_id')->nullable();
+            $table->boolean('is_published')->default(false)->index();
             $table->unsignedInteger('likes_count')->default(0);
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
