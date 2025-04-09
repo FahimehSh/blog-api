@@ -47,7 +47,7 @@ class PostRepository
 
     public function delete($post): void
     {
-        $post->comments()->delete();
+//        $post->comments()->delete();
         $post->delete();
     }
 
