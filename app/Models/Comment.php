@@ -18,18 +18,23 @@ class Comment extends Model
         'published_at',
     ];
 
-    public function user()
+    public function author()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function post()
+    public function commentable()
     {
-        return $this->belongsTo(Post::class);
+        return $this->morphTo();
     }
 
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(Comment::class, 'parent_id');
     }
 }

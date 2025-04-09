@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->text('content');
             $table->unsignedBigInteger('author_id');
-            $table->unsignedBigInteger('post_id');
+            $table->morphs('commentable');
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->unsignedBigInteger('publisher_id')->nullable();
             $table->boolean('is_published')->default(false)->index();
