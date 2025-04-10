@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\TelegramNotificationService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -14,11 +15,10 @@ class UserController extends Controller
         $this->telegramNotificationService = $telegramNotificationService;
     }
 
-    public function getTelegramChatId()
+    public function getTelegramChatId(): JsonResponse
     {
-        $res = $this->telegramNotificationService->getChatId();
+        $res = $this->telegramNotificationService->getUpdates();
         $response_data = end($res['result']);
-
         $telegram_chat_id = $response_data['message']['chat']['id'];
         Auth::user()->telegram_chat_id = $telegram_chat_id;
         Auth::user()->save();

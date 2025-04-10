@@ -17,7 +17,7 @@ class CheckAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما مجوز لازم را ندارید.'], 403);
+            return response()->json(['message' => 'شما مجوز لازم را ندارید.'], Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

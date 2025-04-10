@@ -7,12 +7,6 @@ use App\Services\TelegramNotificationService;
 
 class PostObserver
 {
-    protected $telegramNotificationService;
-
-    public function __construct(TelegramNotificationService $telegramNotificationService)
-    {
-        $this->telegramNotificationService = $telegramNotificationService;
-    }
     /**
      * Handle the Post "created" event.
      */
@@ -26,12 +20,7 @@ class PostObserver
      */
     public function updated(Post $post)
     {
-        if ($post->isDirty('status') && $post->status === 'published') {
-            $author = $post->author;
-            if ($author && $author->telegram_chat_id) {
-                $this->telegramNotificationService->sendMessage($author->telegram_chat_id, 'پست شما منتشر شد.');
-            }
-        }
+        //
     }
 
     /**
@@ -39,7 +28,7 @@ class PostObserver
      */
     public function deleted(Post $post): void
     {
-        //
+        $post->comments()->delete();
     }
 
     /**

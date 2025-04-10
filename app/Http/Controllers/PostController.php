@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
@@ -50,14 +51,14 @@ class PostController extends Controller
         }
 
         if (Auth::id() !== $post->author_id && !Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
+            return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], Response::HTTP_FORBIDDEN);
         }
 
         $postData = $request->except('category_id');
 
         if (isset($postData['status']) && ($postData['status'] === 'published' || $postData['status'] === 'rejected')) {
             if (!Auth::user()->is_admin) {
-                return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
+                return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], Response::HTTP_FORBIDDEN);
             }
 
             $postData['published_at'] = $postData['status'] === 'published' ? now() : null;
@@ -71,7 +72,7 @@ class PostController extends Controller
     public function destroy(int $id): JsonResponse
     {
         if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما دسترسی ندارید!'], 403);
+            return response()->json(['message' => 'شما دسترسی ندارید!'], Response::HTTP_FORBIDDEN);
         }
 
         $post = $this->postService->getById($id);

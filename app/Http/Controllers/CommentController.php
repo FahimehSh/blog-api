@@ -7,6 +7,7 @@ use App\Http\Requests\updateCommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
 {
@@ -52,16 +53,16 @@ class CommentController extends Controller
         }
 
         if (Auth::id() !== $comment->author_id && Auth::user()->is_admin === false) {
-            return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این کامنت را ندارید.'], 403);
+            return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این کامنت را ندارید.'], Response::HTTP_FORBIDDEN);
         }
 
         if (Auth::id() === $comment->author_id && $comment->is_published) {
-            return response()->json(['message' => 'امکان به روزرسانی این کامنت وجود ندارد.'], 403);
+            return response()->json(['message' => 'امکان به روزرسانی این کامنت وجود ندارد.'], Response::HTTP_FORBIDDEN);
         }
 
         if (isset($commentData['is_published'])) {
             if (!Auth::user()->is_admin) {
-                return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], 403);
+                return response()->json(['message' => 'شما مجوز لازم برای به روز رسانی این پست را ندارید.'], Response::HTTP_FORBIDDEN);
             }
 
             $commentData['is_published'] = (bool)$commentData['is_published'];
@@ -82,7 +83,7 @@ class CommentController extends Controller
         }
 
         if (!Auth::user()->is_admin) {
-            return response()->json(['message' => 'شما دسترسی ندارید!'], 403);
+            return response()->json(['message' => 'شما دسترسی ندارید!'], Response::HTTP_FORBIDDEN);
         }
 
         $this->commentService->destroy($comment);

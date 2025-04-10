@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendTelegramNotification;
 use App\Models\Repositories\PostRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,12 @@ class PostService
 
     public function update($post, $categoryId, array $postData): null
     {
-        return $this->postRepository->update($post, $categoryId, $postData);
+        $this->postRepository->update($post, $categoryId, $postData);
+        SendTelegramNotification::dispatch($post)
+            ->onQueue('telegram-notification')
+            ->delay(now()->addMinutes(10));
+
+        return $post;
     }
 
     public function destroy($post): void

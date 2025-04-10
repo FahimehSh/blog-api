@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedInteger('verification_code')->nullable();
             $table->timestamp('mobile_verified_at')->nullable();
             $table->boolean('is_admin')->default(false);
-            $table->bigInteger('telegram_chat_id')->nullable()->index();
+            $table->string('telegram_chat_id')->nullable()->index();
             $table->rememberToken();
             $table->timestamps();
         });

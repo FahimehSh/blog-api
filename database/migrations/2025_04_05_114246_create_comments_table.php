@@ -24,7 +24,6 @@ return new class extends Migration {
             $table->softDeletes();
 
             $table->foreign('author_id')->references('id')->on('users');
-            $table->foreign('post_id')->references('id')->on('posts');
             $table->foreign('parent_id')->references('id')->on('comments');
             $table->foreign('publisher_id')->references('id')->on('users');
         });

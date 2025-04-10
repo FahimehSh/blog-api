@@ -7,15 +7,13 @@ use GuzzleHttp\Client;
 
 class TelegramNotificationService implements NotificationBotInterface
 {
-    public function getChatId(): array
+    public function getUpdates(): array
     {
         $telegram_bot_token = config('services.telegram-bot-api.token');
         $client = new Client();
         $res = $client->post("https://api.telegram.org/bot{$telegram_bot_token}/getUpdates");
 
-        $response = json_decode($res->getBody()->getContents(), true);
-
-        return $response;
+        return json_decode($res->getBody()->getContents(), true);
     }
 
     public function sendMessage($chat_id, $message): array
@@ -28,8 +26,6 @@ class TelegramNotificationService implements NotificationBotInterface
                 'text' => $message,
             ]]);
 
-        $response = json_decode($res->getBody()->getContents(), true);
-
-        return $response;
+        return json_decode($res->getBody()->getContents(), true);
     }
 }
