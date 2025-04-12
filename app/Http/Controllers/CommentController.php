@@ -35,10 +35,10 @@ class CommentController extends Controller
         return response()->json($comment);
     }
 
-    public function store(storeCommentRequest $request): JsonResponse
+    public function storePostComments(storeCommentRequest $request, int $id): JsonResponse
     {
         $commentData = $request->all();
-        $this->commentService->store($commentData);
+        $this->commentService->store($id, $commentData);
 
         return response()->json(['message' => 'کامنت شما با موفقیت ذخیره شد.']);
     }

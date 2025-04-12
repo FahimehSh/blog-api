@@ -5,9 +5,15 @@ namespace App\Models\Repositories;
 
 use App\Models\Comment;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class CommentRepository
 {
+    protected $postRepository;
+    public function __construct(PostRepository $postRepository)
+    {
+        $this->postRepository = $postRepository;
+    }
     public function getAll(): Collection
     {
         return Comment::all();
@@ -23,9 +29,13 @@ class CommentRepository
         return Comment::query()->find($id);
     }
 
-    public function create(array $commentData)
+    public function create(int $postId, array $commentData)
     {
-        return Comment::query()->create($commentData);
+        $post = $this->postRepository->getById($postId);
+        $comment =  new Comment();
+        $comment->author_id = Auth::id();
+        $comment->content = $commentData['content'];
+        $post->comments()->save($comment);
     }
 
     public function update($comment, array $commentData)

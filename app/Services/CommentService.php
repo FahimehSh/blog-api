@@ -3,15 +3,18 @@
 namespace App\Services;
 
 use App\Models\Repositories\CommentRepository;
+use App\Models\Repositories\PostRepository;
 use Illuminate\Support\Facades\Auth;
 
 class CommentService
 {
     protected $commentRepository;
+    protected $postRepository;
 
-    public function __construct(CommentRepository $commentRepository)
+    public function __construct(CommentRepository $commentRepository, PostRepository $postRepository)
     {
         $this->commentRepository = $commentRepository;
+        $this->postRepository = $postRepository;
     }
 
     public function getAll()
@@ -24,10 +27,10 @@ class CommentService
         return $this->commentRepository->getById($id);
     }
 
-    public function store(array $commentData)
+    public function store(int $postId, array $commentData): null
     {
-        $commentData['author_id'] = Auth::id();
-        return $this->commentRepository->create($commentData);
+        $this->commentRepository->create($postId, $commentData);
+        return null;
     }
 
     public function update($comment, array $commentData)

@@ -47,7 +47,7 @@ Route::prefix('posts')->name('posts.')->group(function () {
 
 Route::prefix('comments')->name('comments.')->group(function () {
     Route::get('/', [CommentController::class, 'index'])->name('index');
-    Route::post('/create', [CommentController::class, 'store'])->name('store');
+    Route::post('/create-post-comments/{post}', [CommentController::class, 'storePostComments'])->name('createPostComments');
 
     Route::prefix('{comment}')->group(function () {
         Route::get('/show', [CommentController::class, 'show'])->name('show');
