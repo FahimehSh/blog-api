@@ -29,17 +29,20 @@ class PostService
     public function store($categoryId, array $postData): null
     {
         $postData['author_id'] = Auth::id();
-        return $this->postRepository->create($categoryId, $postData);
+        $this->postRepository->create($categoryId, $postData);
+
+        return null;
     }
 
     public function update($post, $categoryId, array $postData): null
     {
         $this->postRepository->update($post, $categoryId, $postData);
-        SendTelegramNotification::dispatch($post)
-            ->onQueue('telegram-notification')
-            ->delay(now()->addMinutes(10));
+        $telegramNotificationService = new TelegramNotificationService();
+        SendTelegramNotification::dispatch($telegramNotificationService, $post)
+            ->onQueue('notification')
+            ->delay(now()->addMinute());
 
-        return $post;
+        return null;
     }
 
     public function destroy($post): void

@@ -7,7 +7,7 @@ use GuzzleHttp\Client;
 
 class TelegramNotificationService implements NotificationBotInterface
 {
-    public function getUpdates(): array
+    public function getUpdatescontainedChatId(): array
     {
         $telegram_bot_token = config('services.telegram-bot-api.token');
         $client = new Client();

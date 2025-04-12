@@ -4,7 +4,6 @@ namespace App\DTO;
 
 readonly class CreateCategoryDTO
 {
-
     public function __construct(
         public string $name
     )

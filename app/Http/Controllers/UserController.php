@@ -17,7 +17,7 @@ class UserController extends Controller
 
     public function getTelegramChatId(): JsonResponse
     {
-        $res = $this->telegramNotificationService->getUpdates();
+        $res = $this->telegramNotificationService->getUpdatescontainedChatId();
         $response_data = end($res['result']);
         $telegram_chat_id = $response_data['message']['chat']['id'];
         Auth::user()->telegram_chat_id = $telegram_chat_id;
