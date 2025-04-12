@@ -40,9 +40,9 @@ class PostRepository
     {
         $post->update($postData);
         Cache::forget('posts.index');
-        $post->categories()->sync([$categoryId]);
-//        $category = Category::query()->find($categoryId);
-//        $category->update(['posts_count' => $category->posts_count + 1]);
+        $post->categories()->syncWithoutDetaching([$categoryId]);
+        $category = Category::query()->find($categoryId);
+        $category->update(['posts_count' => $category->posts_count + 1]);
     }
 
     public function delete($post): void
