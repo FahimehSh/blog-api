@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    protected $telegramNotificationService;
+    protected TelegramNotificationService $telegramNotificationService;
 
     public function __construct(TelegramNotificationService $telegramNotificationService)
     {
