@@ -29,7 +29,7 @@ class CommentRepository
         return Comment::query()->find($id);
     }
 
-    public function create(int $postId, array $commentData)
+    public function create(int $postId, array $commentData): void
     {
         $post = $this->postRepository->getById($postId);
         $comment =  new Comment();
