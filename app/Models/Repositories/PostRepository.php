@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Cookie;
 
 class PostRepository
 {
@@ -25,6 +26,15 @@ class PostRepository
     public function getById($id)
     {
         return Post::query()->find($id);
+    }
+
+    public function show($post)
+    {
+        if (!Cookie::get('post_viewed_' . $post->id)) {
+            $post->increment('views_count');
+        }
+
+        return $post;
     }
 
     public function create($categoryId, array $postData): void

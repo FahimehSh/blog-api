@@ -32,7 +32,9 @@ class PostController extends Controller
             return response()->json(['message' => 'پست مورد نظر وجود ندارد.'], 404);
         }
 
-        return response()->json($post);
+        $post = $this->postService->show($post);
+
+        return response()->json($post)->withCookie(cookie('post_viewed_' . $post->id, time(), 60 * 24));
     }
 
     public function store(StorePostRequest $request): JsonResponse

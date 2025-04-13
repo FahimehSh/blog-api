@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Jobs\SendTelegramNotification;
 use App\Models\Repositories\PostRepository;
+use App\Notifications\PostPublishedTelegramNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,6 +26,11 @@ class PostService
         return $this->postRepository->getById($id);
     }
 
+    public function show($post)
+    {
+        return $this->postRepository->show($post);
+    }
+
     public function store($categoryId, array $postData): null
     {
         $postData['author_id'] = Auth::id();
@@ -37,10 +42,7 @@ class PostService
     public function update($post, $categoryId, array $postData): null
     {
         $this->postRepository->update($post, $categoryId, $postData);
-        $telegramNotificationService = new TelegramNotificationService();
-        SendTelegramNotification::dispatch($telegramNotificationService, $post)
-            ->onQueue('notification')
-            ->delay(now()->addMinute());
+        $post->author->notify(new PostPublishedTelegramNotification());
 
         return null;
     }

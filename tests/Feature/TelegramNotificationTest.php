@@ -2,28 +2,56 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\WithFaker;
+use AllowDynamicProperties;
+use App\Models\User;
+use App\Notifications\PostPublishedTelegramNotification;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-class TelegramNotificationTest extends TestCase
+#[AllowDynamicProperties] class TelegramNotificationTest extends TestCase
 {
     /**
      * A basic feature test example.
      */
-    public function test_telegram_notification_done_successfully(): void
+    public function test_telegram_notification_sent_successfully(): void
     {
+        $data = [
+            "ok" => true,
+            "result" => [
+                "message_id" => 19,
+                "from" => [
+                    "id" => 7344438601,
+                    "is_bot" => true,
+                    "first_name" => "new channel for notifications",
+                    "username" => "new_blog_notif_bot",
+                ],
+                "chat" => [
+                    "id" => 1735747527,
+                    "first_name" => "Fahimeh",
+                    "last_name" => "Shirdel",
+                    "type" => "private"
+                ],
+                "date" => 1744543619,
+                "text" => "پست شما منتشر شد."
+            ]
+        ];
+
         Http::fake([
-            'https://api.telegram.org/*' => Http::response(['status' => 'success'], 200),
+            'https://api.telegram.org/*' => Http::response($data, 200),
         ]);
 
-        $response = Http::post('https://api.telegram.org/bot' . config('services.telegram-bot-api.token') . '/sendMessage', [
-            'chat_id' => 1735747527,
-            'text' => 'پست شما منتشر شد.'
-        ]);
+        $user = User::query()->where('telegram_chat_id', 1735747527)->first();
 
-        $this->assertEquals(200, $response->status());
-        $this->assertJsonStringEqualsJsonString(json_encode(['status' => 'success']), $response->body());
+        $user->notify(new PostPublishedTelegramNotification());
+
+        Notification::assertSentTo([$user], PostPublishedTelegramNotification::class);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'sendMessage')
+                && $request['chat_id'] == 1735747527
+                && $request['text'] == 'پست شما منتشر شد.';
+        });
     }
 
     public function test_telegram_notification_only_accepts_string_text(): void
