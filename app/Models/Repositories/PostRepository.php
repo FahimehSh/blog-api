@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Cookie;
 
 class PostRepository
 {
-    public function getAll(): Collection
+    public function getAll(int $page, int $perPage): LengthAwarePaginator
     {
-        return Cache::remember('posts.index', now()->addHour(), function () {
-            return Post::all();
+        return Cache::remember('posts.index.page.{$page}.perPage.{$perPage}', now()->addHour(), function () use ($perPage) {
+            return Post::paginate($perPage);
         });
     }
 

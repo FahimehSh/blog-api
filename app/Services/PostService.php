@@ -16,9 +16,9 @@ class PostService
         $this->postRepository = $postRepository;
     }
 
-    public function getAll(): Collection
+    public function getAll(int $page, int $perPage): Collection
     {
-        return $this->postRepository->getAll();
+        return $this->postRepository->getAll($page, $perPage);
     }
 
     public function getById($id)

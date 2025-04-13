@@ -20,7 +20,10 @@ class PostController extends Controller
 
     public function index(): JsonResponse
     {
-        $posts = $this->postService->getAll();
+        $request = request();
+        $page = $request->get('page', 1);
+        $perPage = $request->get('perPage', 10);
+        $posts = $this->postService->getAll($page, $perPage);
 
         return response()->json($posts);
     }
