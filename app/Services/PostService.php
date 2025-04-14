@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Repositories\PostRepository;
 use App\Notifications\PostPublishedTelegramNotification;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
 class PostService
@@ -16,7 +16,7 @@ class PostService
         $this->postRepository = $postRepository;
     }
 
-    public function getAll(int $page, int $perPage): Collection
+    public function getAll(int $page, int $perPage): LengthAwarePaginator
     {
         return $this->postRepository->getAll($page, $perPage);
     }

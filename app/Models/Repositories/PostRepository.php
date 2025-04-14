@@ -5,7 +5,7 @@ namespace App\Models\Repositories;
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Cookie;
 
