@@ -22,7 +22,7 @@ class PostController extends Controller
     {
         $request = request();
         $page = $request->get('page', 1);
-        $perPage = $request->get('perPage', 10);
+        $perPage = $request->get('per_page', 10);
         $posts = $this->postService->getAll($page, $perPage);
 
         return response()->json($posts);

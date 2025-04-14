@@ -13,7 +13,7 @@ class PostRepository
 {
     public function getAll(int $page, int $perPage): LengthAwarePaginator
     {
-        return Cache::remember('posts.index.page.{$page}.perPage.{$perPage}', now()->addHour(), function () use ($perPage) {
+        return Cache::remember("posts.index.page.{$page}.perPage.{$perPage}", now()->addHour(), function () use ($perPage) {
             return Post::paginate($perPage);
         });
     }
