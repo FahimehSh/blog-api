@@ -45,13 +45,17 @@ use Tests\TestCase;
 
         $user->notify(new PostPublishedTelegramNotification());
 
-        Notification::assertSentTo([$user], PostPublishedTelegramNotification::class);
+        $response = Http::post('https://api.telegram.org/bot' . $user->telegram_chat_id . '/sendMessage', [
+            'chat_id' => $user->telegram_chat_id,
+            'text' => "پست شما منتشر شد."
+        ]);
 
         Http::assertSent(function ($request) {
             return str_contains($request->url(), 'sendMessage')
                 && $request['chat_id'] == 1735747527
                 && $request['text'] == 'پست شما منتشر شد.';
         });
+        $this->assertEquals($data, $response->json());
     }
 
     public function test_telegram_notification_only_accepts_string_text(): void

@@ -2,12 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use NotificationChannels\Telegram\TelegramMessage;
 
 class PostPublishedTelegramNotification extends Notification implements ShouldQueue
 {
@@ -26,9 +24,9 @@ class PostPublishedTelegramNotification extends Notification implements ShouldQu
      *
      * @return array<int, string>
      */
-    public function via(object $notifiable): array
+    public function via(object $notifiable): string
     {
-        return ['telegram'];
+        return TelegramChannel::class;
     }
 
     /**
@@ -51,20 +49,6 @@ class PostPublishedTelegramNotification extends Notification implements ShouldQu
     {
         return [
             //
-        ];
-    }
-
-    public function toTelegram(): TelegramMessage
-    {
-        return (new TelegramMessage)
-            ->to(1735747527)
-            ->content('پست شما منتشر شد.');
-    }
-
-    public function withDelay(object $notifiable): array
-    {
-        return [
-            'telegram' => now()->addMinutes(1),
         ];
     }
 }
